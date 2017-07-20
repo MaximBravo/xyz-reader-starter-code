@@ -8,6 +8,7 @@
     android:layout_marginBottom="4dp"
     android:clickable="true"
     android:focusable="true"
+    android:elevation="2dp"
     android:foreground="?selectableItemBackground">
 
     <LinearLayout
@@ -25,14 +26,14 @@
 
         <TextView
             android:id="@+id/article_title"
-            style="@style/TextAppearance.AppCompat.Subhead"
+            style="@style/TextAppearance.AppCompat.Headline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingLeft="16dp"
             android:paddingTop="16dp"
             android:paddingRight="16dp"
+            android:textSize="21sp"
             android:paddingBottom="4dp"
-            android:textColor="@color/ltgray"
             android:ellipsize="end"
             android:maxLines="4" />
 

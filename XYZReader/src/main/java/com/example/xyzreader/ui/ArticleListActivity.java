@@ -150,17 +150,17 @@ public class ArticleListActivity extends ActionBarActivity implements
                     Intent intent = new Intent();
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setData(ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                        View sharedView = view.findViewById(R.id.thumbnail);
-                        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
-                                ArticleListActivity.this,
-                                sharedView,
-                                sharedView.getTransitionName()
-                        ).toBundle();
-                        startActivity(intent, bundle);
-                    } else {
+//                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+//                        View sharedView = view.findViewById(R.id.thumbnail);
+//                        Bundle bundle = ActivityOptions.makeSceneTransitionAnimation(
+//                                ArticleListActivity.this,
+//                                sharedView,
+//                                sharedView.getTransitionName()
+//                        ).toBundle();
+//                        startActivity(intent, bundle);
+//                    } else {
                         startActivity(intent);
-                    }
+//                    }
 
                 }
             });

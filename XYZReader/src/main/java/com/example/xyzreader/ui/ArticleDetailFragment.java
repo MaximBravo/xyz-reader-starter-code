@@ -16,11 +16,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ShareCompat;
+import android.support.v4.util.Pair;
 import android.support.v7.graphics.Palette;
 import android.text.Html;
 import android.text.format.DateUtils;
@@ -42,6 +44,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageLoader;
 import com.example.xyzreader.R;
 import com.example.xyzreader.data.ArticleLoader;
+import com.example.xyzreader.data.Chunk;
+import com.example.xyzreader.remote.Config;
+import com.example.xyzreader.remote.Config.*;
+
+import static com.example.xyzreader.remote.Config.continueLoading;
+import static com.example.xyzreader.remote.Config.killThread;
 
 /**
  * A fragment representing a single Article detail screen. This fragment is
@@ -68,7 +76,9 @@ public class ArticleDetailFragment extends Fragment implements
     private View mPhotoContainerView;
     private ImageView mPhotoView;
     private int mScrollY;
+
     private boolean mIsCard = false;
+
     private int mStatusBarFullOpacityBottom;
     private boolean tabletLandscape;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.sss");
@@ -76,6 +86,7 @@ public class ArticleDetailFragment extends Fragment implements
     private SimpleDateFormat outputFormat = new SimpleDateFormat();
     // Most time functions can only handle 1902 - 2037
     private GregorianCalendar START_OF_EPOCH = new GregorianCalendar(2,1,1);
+    private Chunk lastKnownChunk;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -134,8 +145,25 @@ public class ArticleDetailFragment extends Fragment implements
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
+        final Button loadButton = (Button) mRootView.findViewById(R.id.loadButton);
+        loadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(mCursor != null) {
+                    if(lastKnownChunk == null) {
+                        new SmartTextLoaderAsyncTask().execute(new Chunk((TextView) mRootView.findViewById(R.id.article_body), null, 0));
+                    } else if(lastKnownChunk.getText() == null) {
+                        loadButton.setVisibility(View.GONE);
+                    } else {
+                        new SmartTextLoaderAsyncTask().execute(lastKnownChunk);
+                    }
+                }
+                //continueLoading = true;
+            }
+        });
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            getActivity().startPostponedEnterTransition();
 //        }
@@ -156,9 +184,12 @@ public class ArticleDetailFragment extends Fragment implements
             mScrollView.setCallbacks(new ObservableScrollView.Callbacks() {
                 @Override
                 public void onScrollChanged() {
+
                     mScrollY = mScrollView.getScrollY();
                     getActivityCast().onUpButtonFloorChanged(mItemId, ArticleDetailFragment.this);
                     mPhotoContainerView.setTranslationY((int) (mScrollY - mScrollY / PARALLAX_FACTOR));
+
+                    System.out.println("Continue Loading = " + continueLoading);
                     updateStatusBar();
                     updateFab();
                 }
@@ -275,7 +306,8 @@ public class ArticleDetailFragment extends Fragment implements
                                 + "</font>"));
 
             }
-            bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+            //bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", "<br />")));
+            new SmartTextLoaderAsyncTask().execute(new Chunk(bodyView, null, 0));
             ImageLoaderHelper.getInstance(getActivity()).getImageLoader()
                     .get(mCursor.getString(ArticleLoader.Query.PHOTO_URL), new ImageLoader.ImageListener() {
                         @Override
@@ -302,8 +334,68 @@ public class ArticleDetailFragment extends Fragment implements
             mRootView.setVisibility(View.GONE);
             titleView.setText("N/A");
             bylineView.setText("N/A" );
-            bodyView.setText("N/A");
+            bodyView.setText("");
         }
+    }
+
+    class SmartTextLoaderAsyncTask extends AsyncTask<Chunk, Void, Void> {
+
+        Chunk chunk;
+        @Override
+        protected Void doInBackground(Chunk... params) {
+            chunk = params[0];
+            //stall();
+            if(chunk.getText() == null || chunk.getText().isEmpty()) {
+                if (mCursor != null) {
+                    String text = mCursor.getString(ArticleLoader.Query.BODY).replaceAll("(\r\n|\n)", " ");
+                    chunk.setText(text);
+                    int numOfCharsPerLine = 30;
+                    int numOfLinesPerPage = 18;
+                    int numOfPagesPerPart = 3;
+
+                    int charsPerPart = numOfPagesPerPart * numOfLinesPerPage * numOfCharsPerLine;
+                    int numOfParts = text.length()/charsPerPart;
+                    chunk.setPartLength(text.length()/numOfParts);
+                }
+            } else {
+                chunk.setText(chunk.getText().substring(chunk.getPartLength(), chunk.getText().length()));
+            }
+            return null;
+        }
+
+//        private void stall() {
+//            if(!killThread) {
+//                if (!continueLoading) {
+//                    try {
+//                        Thread.sleep(1000);
+//                        stall();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//            }
+//        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if(chunk.getText() != null && chunk.getTextView() != null) {
+                if (chunk.getText().length() > chunk.getPartLength()) {
+                    chunk.getTextView().setText(chunk.getTextView().getText() + chunk.getText().substring(0, chunk.getPartLength()));
+                    //continueLoading = false;
+                    lastKnownChunk = chunk;
+                } else {
+                    chunk.getTextView().setText(chunk.getTextView().getText() + chunk.getText().substring(0, chunk.getText().length()));
+                    lastKnownChunk = new Chunk(null, null,0);
+                }
+            }
+
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
     }
 
     @Override

@@ -87,6 +87,11 @@
                     android:paddingBottom="@dimen/detail_body_bottom_margin"
                     android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier" />
 
+                <Button
+                    android:id="@+id/loadButton"
+                    android:text="Load More"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
             </com.example.xyzreader.ui.MaxWidthLinearLayout>
         </FrameLayout>
     </com.example.xyzreader.ui.ObservableScrollView>

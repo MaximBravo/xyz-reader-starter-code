@@ -98,5 +98,18 @@
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_share" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/loadButton"
+        android:layout_width="wrap_content"
+        android:stateListAnimator="@anim/fab_state_list_anim"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:elevation="6dp"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/loadmore" />
+
 
 </FrameLayout>

@@ -148,7 +148,7 @@ public class ArticleDetailFragment extends Fragment implements
 
         mRootView = inflater.inflate(R.layout.fragment_article_detail, container, false);
 
-        final Button loadButton = (Button) mRootView.findViewById(R.id.loadButton);
+        final FloatingActionButton loadButton = (FloatingActionButton) mRootView.findViewById(R.id.loadButton);
         loadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

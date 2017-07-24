@@ -87,11 +87,8 @@
                     android:paddingBottom="@dimen/detail_body_bottom_margin"
                     android:lineSpacingMultiplier="@fraction/detail_body_line_spacing_multiplier" />
 
-                <Button
-                    android:id="@+id/loadButton"
-                    android:text="Load More"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+
+
             </com.example.xyzreader.ui.MaxWidthLinearLayout>
         </FrameLayout>
     </com.example.xyzreader.ui.ObservableScrollView>
@@ -109,6 +106,17 @@
         app:fabSize="normal"
         app:srcCompat="@drawable/ic_share" />
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/loadButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|bottom"
+        android:layout_marginStart="@dimen/fab_margin"
+        android:layout_marginBottom="@dimen/fab_margin"
+        android:elevation="6dp"
+        android:clickable="true"
+        app:fabSize="normal"
+        app:srcCompat="@drawable/loadmore" />
 
 
 </com.example.xyzreader.ui.DrawInsetsFrameLayout>

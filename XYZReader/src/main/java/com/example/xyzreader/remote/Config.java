@@ -14,10 +14,11 @@ public class Config {
     public static boolean continueLoading = true;
     public static boolean killThread = false;
 
+    public static String urlUsing = "https://raw.githubusercontent.com/TNTest/xyzreader/master/data.json";
     static {
         URL url = null;
         try {
-            url = new URL("https://go.udacity.com/xyz-reader-json" );
+            url = new URL(urlUsing);
         } catch (MalformedURLException ignored) {
             // TODO: throw a real error
             Log.e(TAG, "Please check your internet connection.");

@@ -164,6 +164,9 @@ public class ArticleDetailFragment extends Fragment implements
                 //continueLoading = true;
             }
         });
+        if(Config.urlUsing.equals("https://raw.githubusercontent.com/TNTest/xyzreader/master/data.json")) {
+            loadButton.setVisibility(View.GONE);
+        }
 //        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 //            getActivity().startPostponedEnterTransition();
 //        }
@@ -381,11 +384,14 @@ public class ArticleDetailFragment extends Fragment implements
             super.onPostExecute(aVoid);
             if(chunk.getText() != null && chunk.getTextView() != null) {
                 if (chunk.getText().length() > chunk.getPartLength()) {
-                    chunk.getTextView().setText(chunk.getTextView().getText() + chunk.getText().substring(0, chunk.getPartLength()));
+                    String cleanedString = Html.fromHtml(chunk.getText().substring(0, chunk.getPartLength())).toString();
+                    chunk.getTextView().setText(chunk.getTextView().getText() + cleanedString);
                     //continueLoading = false;
                     lastKnownChunk = chunk;
                 } else {
-                    chunk.getTextView().setText(chunk.getTextView().getText() + chunk.getText().substring(0, chunk.getText().length()));
+                    String cleanedString = Html.fromHtml(chunk.getText().substring(0, chunk.getText().length())).toString();
+                    chunk.getTextView().setText(chunk.getTextView().getText() + cleanedString);
+
                     lastKnownChunk = new Chunk(null, null,0);
                 }
             }

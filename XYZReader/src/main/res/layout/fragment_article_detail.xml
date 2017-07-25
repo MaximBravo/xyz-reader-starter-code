@@ -119,5 +119,5 @@
         app:srcCompat="@drawable/loadmore" />
 
 
-    
+
 </com.example.xyzreader.ui.DrawInsetsFrameLayout>
